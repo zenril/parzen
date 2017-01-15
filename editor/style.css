@@ -1,0 +1,55 @@
+body{
+    font-family: sans-serif;
+    font-size: 15px;
+}
+.cards{
+    width:70%;
+    float:left;
+
+}
+
+.card:nth-child(1) .listinput{color:#A54657;border-color:#A54657}.card:nth-child(2) .listinput{color:#582630;border-color:#582630}.card:nth-child(3) .listinput{color:#F1A66A;border-color:#F1A66A}.card:nth-child(4) .listinput{color:#89A894;border-color:#89A894}.card:nth-child(5) .listinput{color:#4B644A;border-color:#4B644A}.card:nth-child(6) .listinput{color:#49393B;border-color:#49393B}.card:nth-child(7) .listinput{color:#341C1C;border-color:#341C1C}.card:nth-child(8) .listinput{color:#3E517A;border-color:#3E517A}.card:nth-child(9) .listinput{color:#70CAD1;border-color:#70CAD1}.card:nth-child(10) .listinput{color:#B08EA2;border-color:#B08EA2}.card:nth-child(11) .listinput{color:#220C10;border-color:#220C10}.card:nth-child(12) .listinput{color:#506C64;border-color:#506C64}.card:nth-child(13) .listinput{color:#77CBB9;border-color:#77CBB9}.card:nth-child(14) .listinput{color:#75B8C8;border-color:#75B8C8}.card:nth-child(15) .listinput{color:#A54657;border-color:#A54657}.card:nth-child(16) .listinput{color:#461220;border-color:#461220}.card:nth-child(17) .listinput{color:#8C2F39;border-color:#8C2F39}.card:nth-child(18) .listinput{color:#B23A48;border-color:#B23A48}.card:nth-child(19) .listinput{color:#07020D;border-color:#07020D}.card:nth-child(20) .listinput{color:#5DB7DE;border-color:#5DB7DE}
+
+.card .title{
+    width:350px;
+    display: block;
+}
+
+.card {
+    border-width: 1px;
+    padding:10px;
+    margin:10px;
+    border-radius:5px;
+    border-style: solid;
+}
+
+#widthCalc{
+    min-width: 0;
+    font-size: 15px;
+    font-family: sans-serif;
+    display: inline-block;
+    height:0;
+    overflow: hidden;
+}
+
+.variables{
+    float:left;
+}
+
+.cards input{
+    transition: all 0.2s;
+}
+
+.listinput{
+    border-width: 0 0 1px 0;
+    margin-right: 5px;
+    margin-top: 5px;
+    font-size: 15px;
+    font-family: sans-serif;
+    max-width: 100%;
+}
+
+.previews{
+    width: 30%;
+    float:left;
+}

@@ -1,0 +1,189 @@
+<html>
+    <head>
+        <script src="https://unpkg.com/vue/dist/vue.js"></script>
+        <script src="editor.js"></script>
+        <script src="../ZenBot.js"></script>
+        <link href="style.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+
+        <div id="app">
+            <div class='cards'>
+                 <span id='widthCalc' v-bind:text-content.prop="widthCalc"></span>
+                <div class='card' v-for="(card,index) in cards">
+                    <input v-model='card.name' class='title' v-on:keyup="addCard(cards,index)" v-if='card.locked' readonly/>
+                    <input v-model='card.name' class='title' v-on:keyup="addCard(cards,index)" v-else />
+                    <div v-if='!card.locked'>
+                        <label>Quantitive Terms</label>
+                        <input v-model='card.quantitive' type='checkbox' class='quantitive'/>
+                    </div>
+                    <span v-if='!card.quantitive' v-for="(word,dindex) in card.words.normal">
+                        <input class='listinput' v-model='word.value' :style="{ width: word.width + 'px' }" v-on:keyup="addNewWord(card.words.normal, dindex)" v-on:change="changeWord(card.words.normal, dindex)"/>
+                    </span>
+
+                    <div v-if='card.quantitive'>
+                        <label>Singular</label>
+                        <span v-for="(sword,sindex) in card.words.normal">
+                            <input class='listinput' v-model='sword.value' :style="{ width: sword.width + 'px' }" v-on:keyup="addNewWord(card.words.normal, sindex)" v-on:change="changeWord(card.words.normal, sindex)"/>
+                        </span>
+                        <br/>
+                        <label>Multiple</label>
+                        <span v-for="(mword,mindex) in card.words.multiple">
+                            <input class='listinput' v-model='mword.value' :style="{ width: mword.width + 'px' }" v-on:keyup="addNewWord(card.words.multiple, mindex)" v-on:change="changeWord(card.words.multiple, mindex)"/>
+                        </span>
+                    </div> 
+                </div>               
+            </div>
+            <div class='preview'>
+                <button v-on:click="refresh">refresh</button>
+                <button v-on:click="loadsample1()">load sample 1</button>
+                <button v-on:click="loadsample2()">load sample 2</button>
+                <button v-on:click="loadsample3()">clear</button>
+
+
+                <div v-for="word in previews">
+                        <h3>{{word}}</h3>
+                        </br>
+                </div>
+
+                <h4>template created variables</h4>
+                <ul class='variables'>
+                    <li v-for="(value, key) in defined">
+                        {{key}} : <ul>
+                            <li v-for="word in value">
+                                {{word}}
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                
+            </div>
+            
+        </div>
+        
+        <script>
+
+            function card(name, locked){
+                return {
+                    name : name || " ",
+                    locked : locked,
+                    quantitive : false,
+                    words : { 
+                        normal : [{"value" : "", width:30}],
+                        multiple : [{"value" : "", width:30}]
+                    }
+                }
+            }
+
+            function save(app){
+                if(app){
+                    localStorage['vue-parse'] = JSON.stringify(app.$data);
+                }
+
+                if(localStorage['vue-parse']){
+                    var render = JSON.parse(localStorage['vue-parse']);
+
+                    app.previews = [];
+
+                    
+                        var  maked = new ParZen( fromEditor(render.cards));
+
+                        app.previews.push(
+                           maked.build() 
+                        );
+
+                        app.defined = maked.getUserTemplateVariables();
+                    
+                }
+            }
+
+            function load(){
+                if(!localStorage['vue-parse']){
+                    return false;
+                }
+
+                try{
+                    return JSON.parse(localStorage['vue-parse']);
+                } catch(e) {
+                    return false;
+                }
+            }
+
+            var data = load() || {
+                cards: [card("root", true),card("")],
+                widthCalc : ""
+            };
+
+            data['previews'] = [];
+            data['defined'] = [];
+
+            var app = new Vue({
+                el: '#app',
+                data: data,
+                 methods: {
+                    addNewWord: function (list,index) {
+
+                        if( list[list.length-1].value.trim() != '' ){
+                            list.push({"value" : "", width:15});
+                        }
+
+                        if(index != list.length -1 && list[index].value.trim() == ''){
+                            list.splice(index, 1);
+                            save(app);
+                            return;
+                        }
+
+                        this.widthCalc =  list[index].value; 
+                        var element = this.$el.querySelector("#widthCalc");
+                        list[index].width = (list[index].value == ''? 0 : element.offsetWidth) + 30;      
+                                 
+                        save(app);
+                    },
+                    changeWord: function(list,index,event){this.addNewWord(list,index,event)},
+
+                    addCard:function(cards, index){
+                        if( cards[cards.length-1].name.trim() != '' ){
+                            cards.push(card(""));
+                        }
+
+                        save(app);
+                    },
+                    refresh : function(){
+                        save(app);
+                    },
+                    loadsample1 : function(){
+                         localStorage['vue-parse'] = JSON.stringify({"cards":[{"name":"root","locked":true,"quantitive":false,"words":{"normal":[{"value":"once upon a time there was {{color|an}} {{vehicle}}","width":355},{"value":"The {{vehicle}} had {{color|an}} friend","width":269},{"value":"","width":15}],"multiple":[{"value":"","width":30}]}},{"name":" vehicle","quantitive":false,"words":{"normal":[{"value":"car","width":51},{"value":"truck","width":63},{"value":"lift","width":44},{"value":"bull dozer","width":93},{"value":"","width":15}],"multiple":[{"value":"","width":30}]}},{"name":"color","quantitive":false,"words":{"normal":[{"value":"orange","width":75},{"value":"yellow","width":71},{"value":"pink","width":57},{"value":"ultra violet","width":96},{"value":"","width":15}],"multiple":[{"value":"","width":30}]}},{"name":" ","quantitive":false,"words":{"normal":[{"value":"","width":30}],"multiple":[{"value":"","width":30}]}}],"previews":["once upon a time there was an orange truck"],"widthCalc":"The {{vehicle}} had {{color|an}} friend","defined":{}});
+                        
+                        app.$data.cards = load().cards;
+                        app.$data['previews'] = [];
+                        app.$data['defined'] = [];
+                    },
+                    loadsample2 : function(){
+                        localStorage['vue-parse'] = JSON.stringify({"cards":[{"name":"root","locked":true,"quantitive":false,"words":{"normal":[{"value":"There {[num:multiple?'were':'was']} {{num:number}} big {{thing:things|p:num}}, the {{thing|p:num}} {[num:multiple?'were':'was']} owned by {{adj|an}} {{owner}}","width":894},{"value":"1 {{thing:things|m}} 2 {{thing|m}} 3 {{thing|m}}","width":318},{"value":"","width":15}],"multiple":[{"value":"","width":30}]}},{"name":"number","quantitive":true,"words":{"normal":[{"value":"one","width":54},{"value":"1","width":38},{"value":"a single","width":80},{"value":"a giant","width":73},{"value":"a tiny","width":65},{"value":"","width":15}],"multiple":[{"value":"seven","width":70},{"value":"eight","width":61},{"value":"nine","width":57},{"value":"four","width":55},{"value":"five","width":53},{"value":"seventeen giant  goat","width":165},{"value":"","width":30}]}},{"name":"things","quantitive":false,"words":{"normal":[{"value":"banana","width":78},{"value":"goat","width":58},{"value":"sheep","width":70},{"value":"ape","width":54},{"value":"cheese","width":78},{"value":"pie","width":49},{"value":"","width":15}],"multiple":[{"value":"","width":30}]}},{"name":"owner","quantitive":false,"words":{"normal":[{"value":"human","width":74},{"value":"duck","width":62},{"value":"angry toilet","width":101},{"value":"electric eel","width":100},{"value":"","width":15}],"multiple":[{"value":"","width":30}]}},{"name":" adj","quantitive":false,"words":{"normal":[{"value":"stinky","width":69},{"value":"smelly","width":72},{"value":"big","width":49},{"value":"tall","width":48},{"value":"feathery","width":83},{"value":"slimey","width":72},{"value":"","width":15}],"multiple":[{"value":"","width":30}]}},{"name":" ","quantitive":false,"words":{"normal":[{"value":"","width":30}],"multiple":[{"value":"","width":30}]}}],"widthCalc":"1 {{thing:things|m}} 2 {{thing|m}} 3 {{thing|m}}","previews":["There were five big pies, the pies were owned by a stinky angry toilet"],"defined":{"num":["five"],"thing":["pie"]}});
+                        
+                        app.$data.cards = load().cards;
+                        app.$data['previews'] = [];
+                        app.$data['defined'] = [];
+                    },
+                    loadsample3 : function(){
+                        var data = {
+                            cards: [card("root", true),card("")],
+                            widthCalc : ""
+                        };
+
+                        localStorage['vue-parse'] = JSON.stringify(data);
+                        
+                        app.$data.cards = load().cards;
+                        app.$data['previews'] = [];
+                        app.$data['defined'] = [];
+                    }
+                }
+            });
+
+        </script>
+
+
+    </body>
+</html>
+
+
