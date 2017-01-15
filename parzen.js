@@ -122,8 +122,8 @@ ParZen = function(json){
         return private.plural(words);
     }
 
-    for(var formatFunction in ZenBot.formatters){
-        public.formatters[formatFunction] = ZenBot.formatters[formatFunction];
+    for(var formatFunction in ParZen.formatters){
+        public.formatters[formatFunction] = ParZen.formatters[formatFunction];
     }
 
     private.indefiniteArticle = indefiniteArticle;
@@ -272,6 +272,6 @@ ParZen = function(json){
     }
 }
 
-ZenBot.formatters = {};
+ParZen.formatters = {};
 
 

@@ -2,7 +2,7 @@
     <head>
         <script src="https://unpkg.com/vue/dist/vue.js"></script>
         <script src="editor.js"></script>
-        <script src="../ZenBot.js"></script>
+        <script src="../parzen.js"></script>
         <link href="style.css" rel="stylesheet" type="text/css">
     </head>
     <body>
@@ -40,13 +40,20 @@
                 <button v-on:click="loadsample2()">load sample 2</button>
                 <button v-on:click="loadsample3()">clear</button>
 
-
-                <div v-for="word in previews">
-                        <h3>{{word}}</h3>
-                        </br>
+                <div class='previewer'>
+                    <p><sub>average letters : {{totals.letterCount}} | average words : {{totals.wordCount}}</sub></p>
+                    <p><sub>max letters : {{totals.maxLetter}} | max words : {{totals.maxWord}}</sub></p>
+                    <br>
+                    <div v-for="word in previews">
+                            <p>
+                                {{word.text}}
+                                <p><sub>letters : {{word.letterCount}} | words : {{word.wordCount}}</sub></p>
+                            </p>
+                            <hr/>
+                    </div>
                 </div>
 
-                <h4>template created variables</h4>
+                <!--<h4>template created variables</h4>
                 <ul class='variables'>
                     <li v-for="(value, key) in defined">
                         {{key}} : <ul>
@@ -55,7 +62,7 @@
                             </li>
                         </ul>
                     </li>
-                </ul>
+                </ul>-->
                 
             </div>
             
@@ -84,15 +91,39 @@
                     var render = JSON.parse(localStorage['vue-parse']);
 
                     app.previews = [];
+                    app.totals = {
+                        "wordCount" : 0,
+                        "letterCount" : 0,
+                        "maxWord" : 0,
+                        "maxLetter" : 0 
+                    };
 
-                    
+                    for(var i = 0; i <  20; i ++){
                         var  maked = new ParZen( fromEditor(render.cards));
+                        var words = maked.build();
+                        var wordCount = words.split(' ').length;
+                        var letterCount = words.length;
+
+                        app.totals.wordCount += wordCount;
+                        app.totals.letterCount += letterCount;
+
+                        app.totals.maxWord = wordCount > app.totals.maxWord ? wordCount : app.totals.maxWord;
+                        app.totals.maxLetter = letterCount > app.totals.maxLetter ? letterCount : app.totals.maxLetter;
 
                         app.previews.push(
-                           maked.build() 
+                            {   
+                                "text" : words,
+                                "wordCount" : wordCount,
+                                "letterCount" : letterCount 
+                            }                           
                         );
 
-                        app.defined = maked.getUserTemplateVariables();
+                    }
+
+                    app.totals.wordCount = app.totals.wordCount / 20;
+                    app.totals.letterCount = app.totals.letterCount / 20;
+                    
+                    //app.defined = maked.getUserTemplateVariables();
                     
                 }
             }
@@ -116,6 +147,7 @@
 
             data['previews'] = [];
             data['defined'] = [];
+            data['totals'] = {};
 
             var app = new Vue({
                 el: '#app',
