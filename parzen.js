@@ -105,7 +105,11 @@ ParZen = function(json){
     }
 
     public.formatters.p = function(words, params){
+        if(params === false){
+            return private.plural(words);
+        }
         var word = private.data[params.trim()] || private.userData[params.trim()];
+        
         if(word){
             if( private.variables[word] == 'multiple' ){
                 if( private.data["plurals"] && private.data["plurals"][words]){
@@ -183,7 +187,7 @@ ParZen = function(json){
             for(var mod in modifierArray){
                 var modifierComponents = modifierArray[mod].split(":");
                 
-                modifiers[modifierComponents[0]] = modifierComponents[1] || true;
+                modifiers[modifierComponents[0]] = modifierComponents[1] || false;
             }
 
             variable = split[0].trim();      

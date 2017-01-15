@@ -39,7 +39,7 @@ var json = {
 };
 
 var pz = new ParZen( json );
-var pzSentence = pz.build();
+var sentence = pz.build();
 ```
 
 This is not a good or even fun example however, With such a structure you might get sentences like these
@@ -47,44 +47,53 @@ This is not a good or even fun example however, With such a structure you might 
 * you take 80 percent of the papers you didn't plant
 * you hit 100 percent of the shots you didn't throw
 
-## The basic tag makeup
+# The basic tag makeup
 ### ``` {{variable:list_reference|formatters|or_modifiers}}  ```
+---
+## basic
+The simplest form of the tag only uses `list_reference`. 
+
+This will pull random text from the list of `things`
+
+### ``` {{things}}  ```
+
+---
+
+## storing a value for later
+We can store the text that gets pulled from the list of `things` in a varible called `item` or whatever we want by prepending `item` to `things` seperated by a `:`
+### ``` {{item:things}}  ```
+We can use `item` again by using  it just like a list defined in the json we can reference it with ```{{item}}```
+Infact because `item` is a list we can assign one `things` or many `things` or even text from other lists like `action`
+
+---
+
+## modifiers and formatters
+
+To use modifiers and formatters you would prepend `|` followed by the formatting function `|uc`. `|uc` will upper case the whole selected text. So the whole tag might look like  
+### ``` {{things|uc}}  ```
+### basic formatters
+#### upper case
+* `|uc` will upper case the whole text
+* `|ucw` will upper case the start of each word in the selected text
+* `|ucf` will upper case the first letter in the selected text
+* `|ucr` will randomly upper case the selected text... i dont know why
+
+### Indefinite Article
+#### an vs a
+
+To get `an` or `a` prepended to the start of the selected text based on a vowel or things that sound like they start with a vowel like "honor" we use the formatter `|an`
+
+### ``` {{things|an}}  ```
+
+this will add the `an` or `a` to the start of the selected text, however it will not remove predifined `an's` or `a's`.
+
+### Pluruls
+Arg this get s little more complicated ill finish it in the morning
+
+
 
 only the list_reference is required in a tag. Here is an example of using all the parts.
-```
-var json = {
-	"root" : [
-    	"{{type:temperament|ucf}} {{person:people}} are the {{best}} type of {{person}}
-    ]
-}
-...
-```
-
-I'm no good at writing sample / filler text, so go write something yourself.
-
-Look, a list!
-
- * foo
- * bar
- * baz
-
-And here's some code! :+1:
-
-```javascript
-$(function(){
-  $('div').html('I am a div.');
-});
-```
-
-This is [on GitHub](https://github.com/jbt/markdown-editor) so let me know if I've b0rked it somewhere.
 
 
-Props to Mr. Doob and his [code editor](http://mrdoob.com/projects/code-editor/), from which
-the inspiration to this, and some handy implementation hints, came.
-
-### Stuff used to make this:
-
- * [markdown-it](https://github.com/markdown-it/markdown-it) for Markdown parsing
- * [CodeMirror](http://codemirror.net/) for the awesome syntax-highlighted editor
- * [highlight.js](http://softwaremaniacs.org/soft/highlight/en/) for syntax highlighting in output code blocks
- * [js-deflate](https://github.com/dankogai/js-deflate) for gzipping of data to make it fit in URLs
+You got this far so i supose you can try out my test editor. version Alpha 000000000000000.1, saying that it mostly works :D
+[Test playground](http://tools.aaron-m.co.nz/replacer/editor/editor.html)
