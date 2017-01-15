@@ -59,4 +59,5 @@ body{
     float:left;
         max-height: 700px;
     overflow-y: scroll;
+    width: 100%;
 }
