@@ -8,64 +8,71 @@
     <body>
 
         <div id="app">
-            <div class='cards'>
-                 <span id='widthCalc' v-bind:text-content.prop="widthCalc"></span>
-                <div class='card' v-for="(card,index) in cards">
-                    <input v-model='card.name' class='title' v-on:keyup="addCard(cards,index)" v-if='card.locked' readonly/>
-                    <input v-model='card.name' class='title' v-on:keyup="addCard(cards,index)" v-else />
-                    <div v-if='!card.locked'>
-                        <label>Quantitive Terms</label>
-                        <input v-model='card.quantitive' type='checkbox' class='quantitive'/>
-                    </div>
-                    <span v-if='!card.quantitive' v-for="(word,dindex) in card.words.normal">
-                        <input class='listinput' v-model='word.value' :style="{ width: word.width + 'px' }" v-on:keyup="addNewWord(card.words.normal, dindex)" v-on:change="changeWord(card.words.normal, dindex)"/>
-                    </span>
-
-                    <div v-if='card.quantitive'>
-                        <label>Singular</label>
-                        <span v-for="(sword,sindex) in card.words.normal">
-                            <input class='listinput' v-model='sword.value' :style="{ width: sword.width + 'px' }" v-on:keyup="addNewWord(card.words.normal, sindex)" v-on:change="changeWord(card.words.normal, sindex)"/>
+            <div v-if='!showraw'>
+                <div class='cards'>
+                    <span id='widthCalc' v-bind:text-content.prop="widthCalc"></span>
+                    <div class='card' v-for="(card,index) in cards">
+                        <input v-model='card.name' class='title' v-on:keyup="addCard(cards,index)" v-if='card.locked' readonly/>
+                        <input v-model='card.name' class='title' v-on:keyup="addCard(cards,index)" v-else />
+                        <div v-if='!card.locked'>
+                            <label>Quantitive Terms</label>
+                            <input v-model='card.quantitive' type='checkbox' class='quantitive'/>
+                        </div>
+                        <span v-if='!card.quantitive' v-for="(word,dindex) in card.words.normal">
+                            <input class='listinput' v-model='word.value' :style="{ width: word.width + 'px' }" v-on:keyup="addNewWord(card.words.normal, dindex)" v-on:change="changeWord(card.words.normal, dindex)"/>
                         </span>
-                        <br/>
-                        <label>Multiple</label>
-                        <span v-for="(mword,mindex) in card.words.multiple">
-                            <input class='listinput' v-model='mword.value' :style="{ width: mword.width + 'px' }" v-on:keyup="addNewWord(card.words.multiple, mindex)" v-on:change="changeWord(card.words.multiple, mindex)"/>
-                        </span>
-                    </div> 
-                </div>               
-            </div>
-            <div class='preview'>
-                <button v-on:click="refresh">refresh</button>
-                <button v-on:click="loadsample1()">load sample 1</button>
-                <button v-on:click="loadsample2()">load sample 2</button>
-                <button v-on:click="loadsample3()">clear</button>
 
-                <div class='previewer'>
-                    <p><sub>average letters : {{totals.letterCount}} | average words : {{totals.wordCount}}</sub></p>
-                    <p><sub>max letters : {{totals.maxLetter}} | max words : {{totals.maxWord}}</sub></p>
-                    <br>
-                    <div v-for="word in previews">
-                            <p>
-                                {{word.text}}
-                                <p><sub>letters : {{word.letterCount}} | words : {{word.wordCount}}</sub></p>
-                            </p>
-                            <hr/>
-                    </div>
+                        <div v-if='card.quantitive'>
+                            <label>Singular</label>
+                            <span v-for="(sword,sindex) in card.words.normal">
+                                <input class='listinput' v-model='sword.value' :style="{ width: sword.width + 'px' }" v-on:keyup="addNewWord(card.words.normal, sindex)" v-on:change="changeWord(card.words.normal, sindex)"/>
+                            </span>
+                            <br/>
+                            <label>Multiple</label>
+                            <span v-for="(mword,mindex) in card.words.multiple">
+                                <input class='listinput' v-model='mword.value' :style="{ width: mword.width + 'px' }" v-on:keyup="addNewWord(card.words.multiple, mindex)" v-on:change="changeWord(card.words.multiple, mindex)"/>
+                            </span>
+                        </div> 
+                    </div>               
                 </div>
+                <div class='preview'>
+                    <button v-on:click="raw">raw</button>
+                    <button v-on:click="refresh">refresh</button>
+                    <button v-on:click="loadsample1()">load sample 1</button>
+                    <button v-on:click="loadsample2()">load sample 2</button>
+                    <button v-on:click="loadsample3()">clear</button>
 
-                <!--<h4>template created variables</h4>
-                <ul class='variables'>
-                    <li v-for="(value, key) in defined">
-                        {{key}} : <ul>
-                            <li v-for="word in value">
-                                {{word}}
-                            </li>
-                        </ul>
-                    </li>
-                </ul>-->
-                
+                    <div class='previewer'>
+                        <p><sub>average letters : {{totals.letterCount}} | average words : {{totals.wordCount}}</sub></p>
+                        <p><sub>max letters : {{totals.maxLetter}} | max words : {{totals.maxWord}}</sub></p>
+                        <br>
+                        <div v-for="word in previews">
+                                <p>
+                                    {{word.text}}
+                                    <p><sub>letters : {{word.letterCount}} | words : {{word.wordCount}}</sub></p>
+                                </p>
+                                <hr/>
+                        </div>
+                    </div>
+
+                    <!--<h4>template created variables</h4>
+                    <ul class='variables'>
+                        <li v-for="(value, key) in defined">
+                            {{key}} : <ul>
+                                <li v-for="word in value">
+                                    {{word}}
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>-->
+                    
+                </div>
             </div>
-            
+            <div v-if='showraw'>
+                <button v-on:click="raw">editor</button>
+                <sub><pre>{{rawtext}}
+                </pre></sub>
+            </div>
         </div>
         
         <script>
@@ -98,8 +105,10 @@
                         "maxLetter" : 0 
                     };
 
+                    $editor = fromEditor(render.cards);
+
                     for(var i = 0; i <  20; i ++){
-                        var  maked = new ParZen( fromEditor(render.cards));
+                        var  maked = new ParZen( $editor );
                         var words = maked.build();
                         var wordCount = words.split(' ').length;
                         var letterCount = words.length;
@@ -148,7 +157,8 @@
             data['previews'] = [];
             data['defined'] = [];
             data['totals'] = {};
-
+            data['showraw'] = false;
+            data['rawtext'] = "";
             var app = new Vue({
                 el: '#app',
                 data: data,
@@ -208,6 +218,10 @@
                         app.$data.cards = load().cards;
                         app.$data['previews'] = [];
                         app.$data['defined'] = [];
+                    },
+                    raw : function(){
+                        app.showraw = !app.showraw;
+                        app.rawtext = fromEditor(app.$data.cards);
                     }
                 }
             });
