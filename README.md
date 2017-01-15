@@ -91,9 +91,8 @@ this will add the `an` or `a` to the start of the selected text, however it will
 Arg this get s little more complicated ill finish it in the morning
 
 
-
-only the list_reference is required in a tag. Here is an example of using all the parts.
-
+---
+---
 
 You got this far so i supose you can try out my test editor. version Alpha 000000000000000.1, saying that it mostly works :D
 [Test playground](http://tools.aaron-m.co.nz/replacer/editor/editor.html)
