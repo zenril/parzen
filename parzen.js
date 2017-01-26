@@ -59,223 +59,283 @@ plural = function(e,s){
 * THE SOFTWARE. 
 */ 
 
-ParZen = function(json){
-    var public = this;
+var ParZen = function(json) {
+	var public = this;
     var private = {};
-    private.data = json;
-    private.userData = {};
-    private.variables = {};
-    public.formatters = {};
-    private.flags = {};
+	private.data = json;
+	private.userData = {};
+	private.variables = {};
+	public.formatters = {};
+	private.pathMap = {};
+	private.flags = {};
 
-    public.json = function(json){
-        private.data = json;
-    }
+	public.json = function(json) {
+		private.data = json;
+	}
 
 
-    public.getUserTemplateVariables = function(){
-        return private.userData;
-    }
+	public.getUserTemplateVariables = function() {
+		return private.userData;
+	}
 
-    private.process = function(){
-        return private.getNode("root");
-    }    
+	private.process = function() {
+		return private.getNode("root").str;
+	}
 
-    public.formatters.ucf = function(words, params){
-        return words.charAt(0).toUpperCase() + words.slice(1);
-    }
+	public.formatters.ucf = function(words, params) {
+		return words.charAt(0).toUpperCase() + words.slice(1);
+	}
 
-    public.formatters.uc = function(words, params){
-        return words.toUpperCase();
-    }
+	public.formatters.uc = function(words, params) {
+		return words.toUpperCase();
+	}
 
-    public.formatters.ucr = function(words, params){
-        if(Math.random() > 0.7){
-            return words.toUpperCase();
-        }
-        return words;
-    }
+	public.formatters.ucr = function(words, params) {
+		if (Math.random() > 0.7) {
+			return words.toUpperCase();
+		}
+		return words;
+	}
 
-    public.formatters.ucw = function(words, params){
-       return words.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-    }
+	public.formatters.ucw = function(words, params) {
+		return words.replace(/\w\S*/g, function(txt) {
+			return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+		});
+	}
 
-    public.formatters.an = function(words, params) {
-        return private.indefiniteArticle(words.split(" ")[0]) + " " + words ;
-    }
+	public.formatters.an = function(words, params) {
+		return private.indefiniteArticle(words.split(" ")[0]) + " " + words;
+	}
 
-    public.formatters.p = function(words, params){
-        if(params === false){
-            return private.plural(words);
-        }
-        var word = private.data[params.trim()] || private.userData[params.trim()];
-        
-        if(word){
-            if( private.variables[word] == 'multiple' ){
-                if( private.data["plurals"] && private.data["plurals"][words]){
-                    words = private.data["plurals"][words];
-                } else {
-                    words = private.plural(words);// + (words[words.length-1] == "s"?"e":"") + "s"
-                }
-            }
-        }
-        return words;
-    }
+	public.formatters.p = function(words, params) {
 
-    public.formatters.m = function(words, params){
-        return private.plural(words);
-    }
+		var subpathMap = private.pathMap[params[1]][1].join(".");
+		var tocheckwith = params[params.length - 1];
 
-    for(var formatFunction in ParZen.formatters){
-        public.formatters[formatFunction] = ParZen.formatters[formatFunction];
-    }
+		if (subpathMap.indexOf(tocheckwith) != -1) {
+			if (private.data["plurals"] && private.data["plurals"][words]) {
+				words = private.data["plurals"][words];
+			} else {
+				words = private.plural(words);
+			}
+		}
+		return words;
+	}
 
-    private.indefiniteArticle = indefiniteArticle;
-    private.plural = plural;
+	public.formatters.m = function(words, params) {
+		return private.plural(words);
+	}
 
-    private.getNode = function(name){
+	for (var formatFunction in ParZen.formatters) {
+		public.formatters[formatFunction] = ParZen.formatters[formatFunction];
+	}
 
-        var item = name.split(".");
-        name = item[0].trim();        
-        
-        var data = private.data[name];
-        if(!data){
-            data = private.userData[name];
-        }
-        var key = null;
-        
-        if(!data){
-            throw "Cannot find `" + name + "` in defined JSON lists.";
-        }
+	private.indefiniteArticle = indefiniteArticle;
+	private.plural = plural;
 
-        if(/object/i.test((data).constructor)){
-            var keys = Object.keys(data);
-            key = keys[Math.floor(Math.random() * keys.length)];
-            data = data[key];           
-        }
+	private.getNode = function(name, pathMap) {
 
-        var rand = Math.floor(Math.random() * data.length);
-        
-        if(item[1] != 'undefined'){
-            var notSoRandomAfterAll = parseInt(item[1]);
-            if(notSoRandomAfterAll < data.length){
-                rand = notSoRandomAfterAll;
-            }
-        }
+		var data = private.data[name];
+		if (!data) {
+			data = private.userData[name];
+		}
+		var key = null;
 
-        var node = data[rand];
+		if (!data) {
+			throw "Cannot find `" + name + "` in defined JSON lists.";
+		}
 
-        if(key !== null){
-            private.variables[node] = key;
-        }
+		var parse = data;
+		var pathArray = [];
 
-        //pull tags including brackets
-        var variables = node.match(/\{\{([ a-zA-Z0-9:.-_\*\&\?|]*)\}\}/g);
-        
-        for(var i in variables){
-            //pull current tag
-            var tag = variables[i];
-            
-            //remove brackets
-            var variable = tag.substr(2,tag.length - 4).trim();
+		var t = typeof pathMap != 'undefined' && pathMap != null ? pathMap : [];
+		var i = 0;
 
-            //get modifiers 
-            //sperate modifiers
-            var split = variable.split("|");
-            var modifierArray = split.splice(1); 
-            var modifiers = {};
-            for(var mod in modifierArray){
-                var modifierComponents = modifierArray[mod].split(":");
-                
-                modifiers[modifierComponents[0]] = modifierComponents[1] || false;
-            }
+		do {
+			var key = t[i];
+			i++;
 
-            variable = split[0].trim();      
-            //if we are storing the variable for later use
-            //get storage varible name
-            //sperate from replacement variable name 
-            var parameters = variable.split(":");
-            var name = parameters[1] || parameters[0];
-            var nextnode = private.getNode(name);
+			if (!isNaN(key)) {
+				key = (+key) - 1;
+			} else if (!key || !parse[key]) {
+				var keys = Object.keys(parse);
+				key = keys[Math.floor(Math.random() * keys.length)]
+			}
 
-            //get word modifiers atm it only supports turning on pluralization for defined lists
-            // "root" : [
-            //     "I picked up {{quantities}} round {{things|p}}"
-            // ],
-            // "quantities" : [
-            //     "ten thousand",      <--------\
-            //     "one",                                  | this is the modifier `|p:things`
-            //     "bucket loads of"    <--------/ 
-            // ],
-            // "things" : [
-            //     "ladder",
-            //     "nail",
-            //     ["person","people"],
-            // ]
-            var nextnode = nextnode.split("|");
-            flags = nextnode.splice(1);
-            nextnode = nextnode[0];
-            
-            //load text flags
-            //for turning on pluralization
-            // for(var j in flags){
-            //     var f = flags[j].split(":");
-            //     if(f.length > 1){
-            //         if(!private.flags[f[1]]){
-            //             private.flags[f[1]] = {};
-            //         }
-            //         private.flags[f[1]][f[0]] = true;
-            //     }
-            // }            
+			if (parse[key]) {
+				parse = parse[key];
 
-            //store variable for later use
-            if(parameters[1] && parameters[0]){
-                if(!private.userData[parameters[0]]){
-                    private.userData[parameters[0]] = [];
-                }
-                private.userData[parameters[0]].push(nextnode);
-            }
+				if (isNaN(key)) {
+					pathArray.push(key);
+				}
 
-            for(var mods in modifiers){
-                if(public.formatters[mods]){
-                    nextnode = public.formatters[mods](nextnode, modifiers[mods]);
-                }
-            }
-            //replace relevant tags
-            node = node.replace(tag, nextnode);
-        }
+			} else {
+				break;
+			}
 
-        //{[q1::multiple?'were':'was']}
-        var conditional = node.match(/\{\[([a-zA-Z0-9:.-_\*\&?|']*)\]\}/g);
-        for(var k in conditional){
-            
-            var statementTag = conditional[k];           
-            var statement = statementTag.substr(2,statementTag.length - 4).split("?");
+			if (typeof parse == 'string') {
+				break;
+			}
+		} while (true);
 
-            var sns = statement[0].split(":");
-            var svs = statement[1].substr(1,statement[1].length - 2).split(/['"]\:['"]/);
-            var replacement = svs[1];
+		var node = parse;
 
-            if(private.userData[sns[0]] && private.userData[sns[0]][0]){
-                var word = private.userData[sns[0]][0];
-                if(private.variables[word] == sns[1]){
-                    replacement = svs[0];
-                }
-            }
+		if (key !== null) {
 
-            node = node.replace(statementTag, replacement);
-        }
-        return node;
-    }
+		}
 
- 
-    public.build = function(){
-        private.variables = {};
-        private.data = json;
-        return private.process();
-    }
+		//pull tags including brackets
+		var variables = node.match(/\{\{([ a-zA-Z0-9:.-_\*\&\?|]*)\}\}/g);
+
+		for (var i in variables) {
+			//pull current tag
+			var tag = variables[i];
+
+			//remove brackets
+			var variable = tag.substr(2, tag.length - 4).trim();
+
+			//get modifiers 
+			//sperate modifiers
+			var split = variable.split("|");
+			var modifierArray = split.splice(1);
+			var modifiers = {};
+
+			//save tag modifers in a map to use later under modifers
+			//save the tags pathMap so we can later try and 
+			var pathMap = null;
+			for (var mod in modifierArray) {
+				var modifierComponents = modifierArray[mod].split(":");
+				modifiers[modifierComponents[0]] = modifierComponents || false;
+				if (modifierComponents[0] == "like") {
+					if (private.pathMap[modifierComponents[1]] && private.pathMap[modifierComponents[1]][1]) {
+						pathMap = private.pathMap[modifierComponents[1]][1];
+					}
+				}
+			}
+
+			variable = split[0].trim();
+			//if we are storing the variable for later use
+			//get storage varible name
+			//sperate from replacement variable name 
+			var parameters = variable.split(":");
+			var name = parameters[1] || parameters[0];
+
+
+			if (name && name.indexOf(".") != -1) {
+				pathMap = name.split(".");
+				name = pathMap.shift();
+			}
+
+			var next = private.getNode(name.trim(), pathMap);
+
+			var nextnode = next.str;
+
+			//get word modifiers atm it only supports turning on pluralization for defined lists 
+			//store variable for later use
+			if (parameters[1] && parameters[0]) {
+
+				//check to see if the base key is already being used to store somthing else
+				var list = private.userData[parameters[0]];
+				if (!list) {
+					if (pathArray != null) {
+						//set base object for saving variable against its chosen path
+						var make = private.userData[parameters[0]] = {};
+
+						if (pathArray.length == 0) {
+							make = private.userData[parameters[0]] = [];
+						}
+
+						for (var j = 0; j < pathArray.length; j++) {
+
+							if (!make[pathArray[j]]) {
+								if (j == pathArray.length - 1) {
+									make[pathArray[j]] = [];
+								} else {
+									make[pathArray[j]] = {};
+								}
+							}
+
+							make = make[pathArray[j]];
+						}
+
+						list = make;
+					} else {
+						list = private.userData[parameters[0]] = [];
+					}
+				}
+
+				list.push(nextnode);
+				var pathMap = private.pathMap[parameters[0]] = [parameters[1], next.pathMap];
+			}
+
+			for (var mods in modifiers) {
+				if (public.formatters[mods]) {
+					nextnode = public.formatters[mods](nextnode, modifiers[mods]);
+				}
+			}
+			//replace relevant tags
+			node = node.replace(tag, nextnode);
+		}
+
+		//{[q1::multiple?'were':'was']}
+		var conditional = node.match(/\{\[([a-zA-Z0-9:.-_\*\&?|']*)\]\}/g);
+		for (var k in conditional) {
+
+			var statementTag = conditional[k];
+			var statement = statementTag.substr(2, statementTag.length - 4).split("?");
+
+			var sns = statement[0].split(":");
+			var svs = statement[1].substr(1, statement[1].length - 2).split(/['"]\:['"]/);
+			var replacement = svs[1];
+
+			if (private.userData[sns[0]] && private.userData[sns[0]][0]) {
+				var word = private.userData[sns[0]][0];
+				if (private.variables[word] == sns[1]) {
+					replacement = svs[0];
+				}
+			}
+
+			node = node.replace(statementTag, replacement);
+			node = private.getNode(node).str;
+
+
+		}
+
+		return {
+			"str": node,
+			"pathMap": pathArray
+		};
+	}
+
+
+	public.build = function() {
+		private.variables = {};
+		private.data = json;
+		return private.process();
+	}
 }
 
 ParZen.formatters = {};
 
+ParZen.formatters.drunk = function(word, params){
+    return word.replace(/h\b/, "hed");
+}
 
+var json = {
+    "root" : [
+        "a {{v:miss}} {{things|p:v:dark}}"
+    ],
+    "miss" : { 
+        "dark" : [ "1dark1", "1dark2" ],
+        "light" : [ "1light1","1light2" ]
+        
+    },
+    "number"    : [ "20", "40", "60", "80", "100" ],
+    "things"    : { "dark" :   ["2dark2", "aaa"],  "light": ["2light1","2light2"]},
+    "end"       : ["never {{action}}", "won't {{action}}", "did {{action}}"],
+    "action"    : ["plant", "write", "taste", "touch", "open", "{{miss}}"]   
+};
+
+var pz = new ParZen( json );
+var sentence = pz.build();
+console.log(sentence);
