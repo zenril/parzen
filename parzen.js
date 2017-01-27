@@ -317,25 +317,25 @@ var ParZen = function(json) {
 
 ParZen.formatters = {};
 
-ParZen.formatters.drunk = function(word, params){
-    return word.replace(/h\b/, "hed");
-}
+// ParZen.formatters.drunk = function(word, params){
+//     return word.replace(/h\b/, "hed");
+// }
 
-var json = {
-    "root" : [
-        "a {{v:miss}} {{things|p:v:dark}}"
-    ],
-    "miss" : { 
-        "dark" : [ "1dark1", "1dark2" ],
-        "light" : [ "1light1","1light2" ]
+// var json = {
+//     "root" : [
+//         "a {{v:miss}} {{things|p:v:dark}}"
+//     ],
+//     "miss" : { 
+//         "dark" : [ "1dark1", "1dark2" ],
+//         "light" : [ "1light1","1light2" ]
         
-    },
-    "number"    : [ "20", "40", "60", "80", "100" ],
-    "things"    : { "dark" :   ["2dark2", "aaa"],  "light": ["2light1","2light2"]},
-    "end"       : ["never {{action}}", "won't {{action}}", "did {{action}}"],
-    "action"    : ["plant", "write", "taste", "touch", "open", "{{miss}}"]   
-};
+//     },
+//     "number"    : [ "20", "40", "60", "80", "100" ],
+//     "things"    : { "dark" :   ["2dark2", "aaa"],  "light": ["2light1","2light2"]},
+//     "end"       : ["never {{action}}", "won't {{action}}", "did {{action}}"],
+//     "action"    : ["plant", "write", "taste", "touch", "open", "{{miss}}"]   
+// };
 
-var pz = new ParZen( json );
-var sentence = pz.build();
-console.log(sentence);
+// var pz = new ParZen( json );
+// var sentence = pz.build();
+// console.log(sentence);
