@@ -51,11 +51,11 @@ function ParZen(json) {
 		return pvt.userData;
 	}
 
-	pvt.process = function() {
+	function run() {
         pvt.userData["__finish__"] = [pvt.getNode("root").str];
 		return pvt.getNode("__finish__").str;
 	}
-
+``
 	pub.formatters.ucf = function(words, params) {
 		return words.charAt(0).toUpperCase() + words.slice(1);
 	}
@@ -80,10 +80,6 @@ function ParZen(json) {
 	pub.formatters.an = function(words, params) {
 		return pvt.indefiniteArticle(words.split(" ")[0]) + " " + words;
 	}
-    
-    pub.formatters.r = function(words, params) {
-		return "asd"; 
-	}
 
 	pub.formatters.p = function(words, params) {
 
@@ -104,6 +100,10 @@ function ParZen(json) {
 		return pvt.plural(words);
 	}
 
+	pub.formatters.hide = function(words, params) {
+		return "";
+	}
+
 	/*
 
 		Genterates a rounded random number between two numbers inclusive
@@ -121,43 +121,51 @@ function ParZen(json) {
 		---
 
 	*/
-	pub.preformatters.rran = function(word, params){
+	pub.preformatters.random = function(word, params){
 		var range = params[1].split("-");
 		var first = range[0] || range[1] || 100;
 		var second = range[1] || 1;
 
 		var min = Math.min(first,second);
-		var max = Math.max(first,second);    
+		var max = Math.max(first,second);
 
-		return Math.round(Math.random()*(max-min+1)+min);
+		var number = Math.random()*(max-min+1)+min;
+
+		if(params[2] && !isNaN(params[2])){
+			var decimals  = + (1 + Array.apply(null, {length: (  + params[2] ) + 1}).join("0"));
+			var scaler = + ("0." + Array.apply(null, Array(+params[2])).map(function(a,i){ return (i == (+params[2]) - 1) ? "1" : "0";}).join(''));
+			return Math.round(((+number) + scaler) * decimals) / decimals;
+		}
+
+		return  number;
 	}
 
-	/*
+	// /*
 
-		Genterates a random number between two numbers inclusive
-		but does not round it
+	// 	Genterates a random number between two numbers inclusive
+	// 	but does not round it
 
-		---
-		#|rand:5-100
-		will generate a number between 5 and 100
-		e.g.  74.1937563920
-		---
-		#|rand:100
-		will generate a number between 0 and 100 as there is no start number
-		e.g.  30.7836124262
-		---
+	// 	---
+	// 	#|rand:5-100
+	// 	will generate a number between 5 and 100
+	// 	e.g.  74.1937563920
+	// 	---
+	// 	#|rand:100
+	// 	will generate a number between 0 and 100 as there is no start number
+	// 	e.g.  30.7836124262
+	// 	---
 
-	*/
-	pub.preformatters.ran = function(word, params){
-		var range = params[1].split("-");
-		var first = range[0] || range[1] || 100;
-		var second = range[1] || 1;
+	// */
+	// pub.preformatters.random = function(word, params){
+	// 	var range = params[1].split("-");
+	// 	var first = range[0] || range[1] || 100;
+	// 	var second = range[1] || 1;
 
-		var min = Math.min(first,second);
-		var max = Math.max(first,second);    
+	// 	var min = Math.min(first,second);
+	// 	var max = Math.max(first,second);    
 
-		return Math.random()*(max-min+1)+min;
-	}
+	// 	return Math.random()*(max-min+1)+min;
+	// }
 
 
 	/*
@@ -179,7 +187,8 @@ function ParZen(json) {
 		if(isNaN(word)) return word;
 		if(params[1] && !isNaN(params[1])){
 			var decimals  = + (1 + Array.apply(null, {length: (  + params[1] ) + 1}).join("0"));
-			return Math.floor(((+word) + 0.00001) * decimals) / decimals;
+			var scaler = + ("0." + Array.apply(null, Array(+params[1])).map(function(a,i){ return (i == (+params[1]) - 1) ? "1" : "0";}).join(''));
+			return Math.floor(((+word) + scaler) * decimals) / decimals;
 		}
 		return Math.floor(word);
 	}
@@ -204,7 +213,8 @@ function ParZen(json) {
 		if(isNaN(word)) return word;
 		if(params[1] && !isNaN(params[1])){
 			var decimals  = + (1 + Array.apply(null, {length: (  + params[1] ) + 1}).join("0"));
-			return Math.ceil(((+word) + 0.00001) * decimals) / decimals;
+			var scaler = + ("0." + Array.apply(null, Array(+params[1])).map(function(a,i){ return (i == (+params[1]) - 1) ? "1" : "0";}).join(''));
+			return Math.ceil(((+word) + scaler) * decimals) / decimals;
 		}
 		return Math.ceil(word);
 	}
@@ -229,7 +239,8 @@ function ParZen(json) {
 		if(isNaN(word)) return word;
 		if(params[1] && !isNaN(params[1])){
 			var decimals  = + (1 + Array.apply(null, {length: (  + params[1] ) + 1}).join("0"));
-			return Math.round(((+word) + 0.00001) * decimals) / decimals;
+			var scaler = + ("0." + Array.apply(null, Array(+params[1])).map(function(a,i){ return (i == (+params[1]) - 1) ? "1" : "0";}).join(''));
+			return Math.round(((+word) + scaler) * decimals) / decimals;
 		}
 		return Math.round(word);
 	}
@@ -456,7 +467,6 @@ function ParZen(json) {
 					nextnode = pub.formatters[mods](nextnode, modifiers[mods], pvt.userData, pvt.data);
 				}
 			}
-
             
 			//replace relevant tags
 			node = node.replace(tag, nextnode);
@@ -491,10 +501,12 @@ function ParZen(json) {
 	}
 
 
+
 	pub.build = function() {
 		pvt.variables = {};
 		pvt.data = json;
-		return pvt.process();
+		
+		return run();
 	}
 }
 
@@ -543,7 +555,7 @@ function plural(e,s){
 
 //"The boy bought {{bottles:#|rran:2-10}} bottles of milk for ${{price:#|ran:4-6|rnd:2}} that costed a total of ${{total:bottles|op:*:price|rnd:2}}, however if had of bought {{bottles}} bottles of water for ${{wprice:#|ran:1-3|rnd:2}} each, he would have had spent ${{wtotal:bottles|op:*:wprice|rnd:2}} and saved ${{total|op:-:wtotal|rnd:2}} candy and tooth decay"
 // var json = {
-//     "root" : ["{{v:list|op:*:31}}"],
+//     "root" : ["{{v:#|random:30.5-30.6:2}} "],
 //     "list" : ["1","2","3","4","5"]
 // };
 
