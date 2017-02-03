@@ -97,6 +97,7 @@ function ParZen(json) {
 	}
 
 	pub.formatters.m = function(words, params) {
+		
 		return pvt.plural(words);
 	}
 
@@ -554,11 +555,11 @@ function plural(e,s){
 
 
 //"The boy bought {{bottles:#|rran:2-10}} bottles of milk for ${{price:#|ran:4-6|rnd:2}} that costed a total of ${{total:bottles|op:*:price|rnd:2}}, however if had of bought {{bottles}} bottles of water for ${{wprice:#|ran:1-3|rnd:2}} each, he would have had spent ${{wtotal:bottles|op:*:wprice|rnd:2}} and saved ${{total|op:-:wtotal|rnd:2}} candy and tooth decay"
-// var json = {
-//     "root" : ["{{v:#|random:30.5-30.6:2}} "],
-//     "list" : ["1","2","3","4","5"]
-// };
+var json = {
+    "root" : ["{{v:#|random:1-3|rounddown}} {{list|m:v}}"],
+    "list" : ["pig","kid","pie"]
+};
 
-// var pz = new ParZen( json );
-// var sentence = pz.build();
-// console.log(sentence);
+var pz = new ParZen( json );
+var sentence = pz.build();
+console.log(sentence);
