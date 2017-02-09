@@ -90,7 +90,7 @@ var words = "aah aahed aahs aargh aas abaci aback abamp abase abash abate abbey 
 
         
 
-       
+       console.log("sa");
     
         //console.log(map["m"]["e"]["a"], map["v"]);
 
@@ -112,7 +112,7 @@ var words = "aah aahed aahs aargh aas abaci aback abamp abase abash abate abbey 
         do {
             var select = wmap[letter][1].pick;
             var newletter = select[Math.floor(Math.random() * select.length)];
-            
+             
             if(wmap[newletter][0][letter] < 0.7){
                 letter = all[Math.floor(Math.random() * all.length)];
                 word = word.slice(0,-1) + letter;
