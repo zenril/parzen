@@ -8,27 +8,31 @@ var words = "aah aahed aahs aargh aas abaci aback abamp abase abash abate abbey 
 
             if(wc && wc != " "){
                 if(!wmap[wc]){
-                    wmap[wc] = [{ "pick": [], "max":0, "min":999999 },{ "pick": [], "max":0, "min":999999 }];
+                    wmap[wc] = [{ "list": [], "map" : {}, "max":0, "min":999999 },{ "list": [], "map" : {}, "letters": [], "max":0, "min":999999 }];
                 } 
             } else {
                 continue;   
             }
 
             if(wp && wp != " "){
-                if(!wmap[wc][0][wp]){
-                    wmap[wc][0][wp] = 0;
+                if(!wmap[wc][0].map[wp]){
+                    wmap[wc][0].map[wp] = {"value":wp, "score":0};
+                    wmap[wc][0].list.push(wmap[wc][0].map[wp]);
                 }
                 
-                wmap[wc][0][wp]++;
+                 wmap[wc][0].map[wp].score++;
+                
                 
 
-                if(wmap[wc][0][wp] > wmap[wc][0]["max"]){
-                    wmap[wc][0]["max"] = wmap[wc][0][wp];
+                if(wmap[wc][0].map[wp].score > wmap[wc][0].max){
+                    wmap[wc][0].max = wmap[wc][0].map[wp].score;
                 }
 
-                if(wmap[wc][0][wp] < wmap[wc][0]["min"]){
-                    wmap[wc][0]["min"] = wmap[wc][0][wp];
+                if(wmap[wc][0].map[wp].score < wmap[wc][0].min){
+                    wmap[wc][0].min = wmap[wc][0].map[wp].score;
                 }
+
+               
 
                 
             } else {
@@ -36,19 +40,24 @@ var words = "aah aahed aahs aargh aas abaci aback abamp abase abash abate abbey 
             }
 
             if(wn && wn != " "){
-                if(!wmap[wc][1][wn]){
-                    wmap[wc][1][wn] = 0;
-                }
-                wmap[wc][1][wn]++;
-                //wmap[wc][1]["pick"].push(wn);
+                if(!wmap[wc][1].map[wn]){
+                    wmap[wc][1].map[wn] = {"value":wn, "score":0};
+                    wmap[wc][1].list.push(wmap[wc][1].map[wn])
+                } 
                 
-                if(wmap[wc][1][wn] > wmap[wc][1]["max"]){
-                    wmap[wc][1]["max"] = wmap[wc][1][wn];
+                 wmap[wc][1].map[wn].score++;
+                
+
+                if(wmap[wc][1].map[wn].score > wmap[wc][1].max){
+                    wmap[wc][1].max = wmap[wc][1].map[wn].score;
+                    
                 }
 
-                if(wmap[wc][1][wn] < wmap[wc][1]["min"]){
-                    wmap[wc][1]["min"] = wmap[wc][1][wn];
+                if(wmap[wc][1].map[wn].score < wmap[wc][1].min){
+                    wmap[wc][1].min = wmap[wc][1].map[wn].score;
                 }
+
+                 
 
                 
             } else {
@@ -59,33 +68,41 @@ var words = "aah aahed aahs aargh aas abaci aback abamp abase abash abate abbey 
         for (var key in wmap) {
            if (wmap.hasOwnProperty(key)) { 
                var welement = wmap[key];
+                delete welement[0]['map'];
+                delete welement[1]['map'];
 
-                
-                for (var item in welement[0]) {
-                    if (welement[0].hasOwnProperty(item) && item.length == 1) {
-                        var ton =  welement[0][item];
-                        welement[0][item] = (ton  - welement[0]["min"]) / (welement[0]["max"]  - welement[0]["min"]);
-                        if(welement[0][item] > 0.7){
-                            welement[0]["pick"].push(item);
-                        }
-                    }                
+                var keep1 = [];
+                var prevLetters = welement[0].list;
+                for (var item in prevLetters) {
+                    prevLetters[item].score = (prevLetters[item].score  - welement[0].min) / (welement[0].max  - welement[0].min);
+                    if(prevLetters[item].score > 0.4){
+                        keep1.push(prevLetters[item]);
+                    }                               
                 }
+                welement[0] = keep1;
 
-
-                for (var item in welement[1]) {
-                    if (welement[1].hasOwnProperty(item) && item.length == 1) {
-                        var ton =  welement[1][item];
-                        welement[1][item] = (ton  - welement[1]["min"]) / (welement[1]["max"]  - welement[1]["min"]);
-                        if(welement[1][item] > 0.7){
-                            welement[1]["pick"].push(item);
-                        }
-                    }                
+                var keep2 = [];
+                var nextLetters = welement[1].list;
+                for (var item in nextLetters) {
+                    nextLetters[item].score = (nextLetters[item].score  - welement[1].min) / (welement[1].max  - welement[1].min);
+                    if(nextLetters[item].score > 0.4){
+                        keep2.push(nextLetters[item]);
+                    }        
                 }
+                welement[1] = keep2;
 
-            }   
+            }    
                         
         }
 
+var fs = require('fs');
+var stream = fs.createWriteStream("my_file.json");
+stream.once('open', function(fd) {
+  stream.write(JSON.stringify(wmap));
+  stream.end();
+});
+
+console.log();
     ParZen.preformatters.gen = function(word, params){
 
         
@@ -98,37 +115,37 @@ var words = "aah aahed aahs aargh aas abaci aback abamp abase abash abate abbey 
 
         //"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", , "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
         //"aeiou"
-        var all = "abcdefghijklmnopqrstuvwxyz";
+        // var all = "abcdefghijklmnopqrstuvwxyz";
 
-        var number = Math.floor ( 4 + (Math.random() * 3 ));
-        var letter = all[Math.floor(Math.random() * all.length)];
-        var word = letter;
+        // var number = Math.floor ( 4 + (Math.random() * 3 ));
+        // var letter = all[Math.floor(Math.random() * all.length)];
+        // var word = letter;
         
-        //console.log( newletter, wmap["a"][0] ); 
+        // //console.log( newletter, wmap["a"][0] ); 
         
-        var t = true;
+        // var t = true;
 
-        var k = 0;
-        do {
-            var select = wmap[letter][1].pick;
-            var newletter = select[Math.floor(Math.random() * select.length)];
+        // var k = 0;
+        // do {
+        //     var select = wmap[letter][1].pick;
+        //     var newletter = select[Math.floor(Math.random() * select.length)];
              
-            if(wmap[newletter][0][letter] < 0.7){
-                letter = all[Math.floor(Math.random() * all.length)];
-                word = word.slice(0,-1) + letter;
-            }           
+        //     if(wmap[newletter][0][letter] < 0.7){
+        //         letter = all[Math.floor(Math.random() * all.length)];
+        //         word = word.slice(0,-1) + letter;
+        //     }           
 
-            if( wmap[newletter][0][letter] > 0.7 ){
-                letter = newletter;
-                word += letter;                
-            } else {
-                continue;
-            }
+        //     if( wmap[newletter][0][letter] > 0.7 ){
+        //         letter = newletter;
+        //         word += letter;                
+        //     } else {
+        //         continue;
+        //     }
             
-            if(k == number) break;
+        //     if(k == number) break;
 
-            k++;
-        } while (true);
+        //     k++;
+        // } while (true);
 
         return word;
     }
