@@ -1,6 +1,6 @@
 {
   "name": "parzen",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "Recursive sentence formatter and generator",
   "main": "dist/scripts/parzen.js",
   "dependencies": {
