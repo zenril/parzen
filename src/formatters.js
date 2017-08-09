@@ -1,4 +1,3 @@
-if(ParZen){
 
 
     //preformatters will format the words before any assignment to variables. so the random function or boolean operations probably want to be saveved for later.
@@ -25,6 +24,15 @@ if(ParZen){
             return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
         });
     }
+
+    ParZen.preformatters.reverse = function(words, params) {
+        return words.split('').reverse().join('');
+    }
+
+    ParZen.preformatters.wordreverse = function(words, params) {
+        return words.split('').reverse().join('').split(' ').reverse().join(' ');
+    }
+
 
     if(indefiniteArticle){
         ParZen.formatters.an = function(words, params) {
@@ -328,21 +336,21 @@ if(ParZen){
     }
 
  
-}
 
 
 
 
 
-//found here
-//http://stackoverflow.com/questions/27194359/javascript-pluralize-a-string
 
-var json = {
-    "root" : ["{{hello:list|randomfill}}  asdasd {{#|gen}}  {{#|gen}}  "],
-    "list" : ["a%d%d","b%d%d","c%d%d"]
-};
+// //found here
+// //http://stackoverflow.com/questions/27194359/javascript-pluralize-a-string
+
+// var json = {
+//     "root" : ["{{hello:list|randomfill}}  asdasd {{#|gen}}  {{#|gen}}  "],
+//     "list" : ["a%d%d","b%d%d","c%d%d"]
+// };
 
 
-var pz = new ParZen( json ); 
-var sentence = pz.build();
-console.log(sentence);
+// var pz = new ParZen( json ); 
+// var sentence = pz.build();
+// console.log(sentence);
