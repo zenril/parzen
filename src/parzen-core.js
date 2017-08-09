@@ -228,7 +228,7 @@ function ParZen(json) {
             for (var f = 0; f < modifiers.length; f++) {
 				var mod = modifiers[f][0];
 				if ( pub.formatters[mod] ) {
-					func = pub.formatters[pub.formatters[mod][0]];
+					func = pub.formatters[mod];
 					nextnode = func.apply(pub, [nextnode, modifiers[f]]);
 				}
 			}
