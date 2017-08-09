@@ -26,9 +26,7 @@
 * THE SOFTWARE. 
 */ 
 
-if(module && module.exports){
-    module.exports = ParZen;
-}
+
 
 
 function ParZen(json) {
@@ -277,4 +275,12 @@ function ParZen(json) {
 
 ParZen.formatters = {};
 ParZen.preformatters = {};
+
+function moduleinit(){
+	if( typeof module  != "undefined" && module.exports ){
+		module.exports = ParZen;	
+	}
+}
+
+moduleinit();
 

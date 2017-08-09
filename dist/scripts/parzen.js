@@ -26,9 +26,7 @@
 * THE SOFTWARE. 
 */ 
 
-if(module && module.exports){
-    module.exports = ParZen;
-}
+
 
 
 function ParZen(json) {
@@ -277,6 +275,14 @@ function ParZen(json) {
 
 ParZen.formatters = {};
 ParZen.preformatters = {};
+
+function moduleinit(){
+	if( typeof module  != "undefined" && module.exports ){
+		module.exports = ParZen;	
+	}
+}
+
+moduleinit();
 
 
 /*
@@ -1117,23 +1123,3 @@ var WtoN = {
 
         return word;
     }
-
- 
-
-
-
-
-
-
-// //found here
-// //http://stackoverflow.com/questions/27194359/javascript-pluralize-a-string
-
-// var json = {
-//     "root" : ["{{hello:list|randomfill}}  asdasd {{#|gen}}  {{#|gen}}  "],
-//     "list" : ["a%d%d","b%d%d","c%d%d"]
-// };
-
-
-// var pz = new ParZen( json ); 
-// var sentence = pz.build();
-// console.log(sentence);
