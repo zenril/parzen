@@ -92,7 +92,7 @@ this will add the `an` or `a` to the start of the selected text, however it will
 
 this will add the `an` or `a` to the start of the selected text, however it will not remove predifined `an's` or `a's`.
 
-##Nested or grouping Tags
+## Nested or grouping Tags
 For.. reasons we can group words in sub lists say if we have big animals and small animals we can do the following, this will be useful for various reasons
 ```
 var json = {
@@ -130,7 +130,7 @@ Will only select big animals
 # Tags that reference other tags
 As we have covered you can store variables and you can nest lists when you store a variable it will remember what group list it came from.
 
-##Select from Like selected
+## Select from Like selected
 We can store a vairable like ```{{a1:animal}}```... `a1` then when we select from another same grouped list or the same animal list, we can tell it to select from the group `a1` came from with the `|like` modifier. In this example we can do `{{animal|like:a1}}`.
 
 ```
@@ -142,15 +142,15 @@ var json = {
 };
 ```
 
-##Pluralize
+## Pluralize
 This is under "Tags that reference other tags" as we can do conditional pluralization based on stored variables. 
 
 But  first the basic example
-###basic
+### basic
 we can force a plural by just using `|m`
 #### ```{{animal|m}}```
 
-###Advanced
+### Advanced
 lets say we have a list with numbers in it.
 ```
 $json = {
