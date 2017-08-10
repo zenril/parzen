@@ -228,7 +228,7 @@ function ParZen(json) {
             for (var f = 0; f < modifiers.length; f++) {
 				var mod = modifiers[f][0];
 				if ( pub.formatters[mod] ) {
-					func = pub.formatters[pub.formatters[mod][0]];
+					func = pub.formatters[mod];
 					nextnode = func.apply(pub, [nextnode, modifiers[f]]);
 				}
 			}
@@ -237,8 +237,8 @@ function ParZen(json) {
 			node = node.replace(tag, nextnode);
 		}
 
-		//{[q1::multiple?'were':'was']}
-		var conditional = node.match(/\{\[([a-zA-Z0-9:.\-_\*\&?|'\/\{\}]*)\]\}/g);
+		//{(q1::multiple?'were':'was')}
+		var conditional = node.match(/\{\(([a-zA-Z0-9:.\-_\*\&?|'\/\{\}]*)\)\}/g);
 		for (var k in conditional) {
 
 			var statementTag = conditional[k];
@@ -1123,3 +1123,23 @@ var WtoN = {
 
         return word;
     }
+
+ 
+
+
+
+
+
+
+// //found here
+// //http://stackoverflow.com/questions/27194359/javascript-pluralize-a-string
+
+// var json = {
+//     "root" : ["{{hello:list|randomfill}}  asdasd {{#|gen}}  {{#|gen}}  "],
+//     "list" : ["a%d%d","b%d%d","c%d%d"]
+// };
+
+
+// var pz = new ParZen( json ); 
+// var sentence = pz.build();
+// console.log(sentence);

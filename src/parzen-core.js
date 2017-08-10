@@ -237,8 +237,8 @@ function ParZen(json) {
 			node = node.replace(tag, nextnode);
 		}
 
-		//{[q1::multiple?'were':'was']}
-		var conditional = node.match(/\{\[([a-zA-Z0-9:.\-_\*\&?|'\/\{\}]*)\]\}/g);
+		//{(q1::multiple?'were':'was')}
+		var conditional = node.match(/\{\(([a-zA-Z0-9:.\-_\*\&?|'\/\{\}]*)\)\}/g);
 		for (var k in conditional) {
 
 			var statementTag = conditional[k];
